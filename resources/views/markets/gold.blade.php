@@ -1,297 +1,144 @@
 @extends('layouts.app')
 
-@section('title', 'قیمت طلا | داشبورد بازار')
+@section('title', 'بازار طلا')
 
 @section('styles')
 <style>
-    /* استایل‌های اصلی */
     .market-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
         margin-bottom: 30px;
     }
     
     .market-title {
-        display: flex;
-        align-items: center;
-    }
-    
-    .market-title h1 {
-        font-size: 2rem;
+        font-size: 1.8rem;
         font-weight: 700;
-        margin: 0;
         color: var(--text-primary);
-    }
-    
-    .market-title .icon {
-        width: 50px;
-        height: 50px;
-        background-color: #F7931A;
-        border-radius: 50%;
+        margin-bottom: 10px;
         display: flex;
         align-items: center;
-        justify-content: center;
-        margin-left: 15px;
-        box-shadow: 0 5px 15px rgba(247, 147, 26, 0.3);
     }
     
-    .market-title .icon i {
-        color: white;
-        font-size: 1.5rem;
+    .market-title i {
+        margin-left: 15px;
+        color: #FFD700;
     }
     
     .market-subtitle {
         color: var(--text-secondary);
-        font-size: 1rem;
-        margin-top: 5px;
+        margin-bottom: 20px;
     }
     
-    .refresh-btn {
-        background-color: var(--hover-bg);
-        border: 1px solid var(--card-border);
-        color: var(--text-primary);
-        padding: 8px 20px;
-        border-radius: 8px;
-        font-size: 0.9rem;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-    }
-    
-    .refresh-btn:hover {
-        background-color: var(--primary-color);
-        color: white;
-    }
-    
-    .refresh-btn i {
-        margin-left: 8px;
-    }
-    
-    /* کارت قیمت */
     .price-card {
         background-color: var(--card-bg);
         border: 1px solid var(--card-border);
         border-radius: 12px;
-        padding: 25px;
-        margin-bottom: 25px;
-        transition: all 0.3s ease;
-        text-align: center;
-        position: relative;
-        overflow: hidden;
+        padding: 20px;
         height: 100%;
+        transition: all 0.3s ease;
     }
     
     .price-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
     }
     
-    .price-card .card-icon {
-        width: 50px;
-        height: 50px;
-        background-color: rgba(247, 147, 26, 0.1);
-        border-radius: 50%;
+    .price-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 15px;
         display: flex;
         align-items: center;
-        justify-content: center;
-        margin: 0 auto 15px;
     }
     
-    .price-card .card-icon i {
-        font-size: 20px;
-        color: #F7931A;
+    .price-title i {
+        margin-left: 10px;
+        color: #FFD700;
     }
     
-    .price-card .title {
-        font-size: 1.2rem;
-        font-weight: 600;
-        margin-bottom: 5px;
-        color: var(--text-primary);
-    }
-    
-    .price-card .subtitle {
-        font-size: 0.85rem;
-        color: var(--text-secondary);
-        margin-bottom: 20px;
-    }
-    
-    .price-card .price {
-        font-size: 1.8rem;
+    .price-value {
+        font-size: 1.5rem;
         font-weight: 700;
-        margin-bottom: 15px;
         color: var(--text-primary);
+        margin-bottom: 10px;
     }
     
-    .price-card .change {
+    .price-change {
         display: inline-block;
-        padding: 6px 12px;
+        padding: 3px 8px;
         border-radius: 20px;
-        font-size: 0.9rem;
-        font-weight: 600;
-        margin-bottom: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        margin-bottom: 15px;
     }
     
-    .price-card .change.positive {
+    .price-change.positive {
         background-color: rgba(0, 194, 111, 0.1);
         color: var(--accent-color);
     }
     
-    .price-card .change.negative {
+    .price-change.negative {
         background-color: rgba(234, 57, 67, 0.1);
         color: var(--danger-color);
     }
     
-    .price-card .range {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 20px;
-        padding-top: 20px;
-        border-top: 1px solid var(--card-border);
-    }
-    
-    .price-card .range .item {
-        text-align: center;
-    }
-    
-    .price-card .range .label {
+    .price-time {
         font-size: 0.85rem;
         color: var(--text-secondary);
-        margin-bottom: 5px;
     }
     
-    .price-card .range .value {
-        font-size: 1rem;
-        color: var(--text-primary);
-        font-weight: 500;
-    }
-    
-    .price-card .updated-time {
-        font-size: 0.8rem;
-        color: var(--text-muted);
-        margin-top: 20px;
-    }
-    
-    /* جدول قیمت‌ها */
-    .price-table-card {
+    .price-table {
         background-color: var(--card-bg);
         border: 1px solid var(--card-border);
         border-radius: 12px;
-        padding: 25px;
-        margin-bottom: 25px;
-    }
-    
-    .price-table-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-        padding-bottom: 15px;
-        border-bottom: 1px solid var(--card-border);
+        padding: 20px;
+        margin-bottom: 30px;
     }
     
     .price-table-title {
         font-size: 1.2rem;
         font-weight: 600;
         color: var(--text-primary);
+        margin-bottom: 20px;
         display: flex;
         align-items: center;
     }
     
     .price-table-title i {
         margin-left: 10px;
-        color: #F7931A;
+        color: #FFD700;
     }
     
-    .price-table {
+    table {
         width: 100%;
         border-collapse: collapse;
     }
     
-    .price-table th {
-        color: var(--text-secondary);
-        font-weight: 500;
+    th, td {
         padding: 12px 15px;
         text-align: right;
-        border-bottom: 1px solid var(--card-border);
     }
     
-    .price-table td {
-        padding: 15px;
-        border-bottom: 1px solid var(--card-border);
-        vertical-align: middle;
+    th {
+        background-color: var(--hover-bg);
+        color: var(--text-primary);
+        font-weight: 600;
     }
     
-    .price-table tr:last-child td {
-        border-bottom: none;
+    td {
+        color: var(--text-secondary);
+        border-top: 1px solid var(--card-border);
     }
     
-    .price-table tr:hover {
+    tr:hover td {
         background-color: var(--hover-bg);
     }
     
-    .price-table .asset-name {
-        display: flex;
-        align-items: center;
-    }
-    
-    .price-table .asset-icon {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-left: 10px;
-        background-color: rgba(247, 147, 26, 0.1);
-    }
-    
-    .price-table .asset-icon i {
-        font-size: 16px;
-        color: #F7931A;
-    }
-    
-    .price-table .asset-title {
-        font-weight: 600;
-        color: var(--text-primary);
-    }
-    
-    .price-table .asset-subtitle {
-        font-size: 0.85rem;
-        color: var(--text-secondary);
-    }
-    
-    .price-table .price-value {
-        font-weight: 600;
-        color: var(--text-primary);
-    }
-    
-    .price-table .price-change {
-        font-weight: 600;
-        padding: 5px 10px;
-        border-radius: 20px;
-        display: inline-block;
-        min-width: 80px;
-        text-align: center;
-    }
-    
-    .price-table .price-change.positive {
-        background-color: rgba(0, 194, 111, 0.1);
-        color: var(--accent-color);
-    }
-    
-    .price-table .price-change.negative {
-        background-color: rgba(234, 57, 67, 0.1);
-        color: var(--danger-color);
-    }
-    
-    /* نمودار */
-    .chart-card {
+    .chart-container {
         background-color: var(--card-bg);
         border: 1px solid var(--card-border);
         border-radius: 12px;
-        padding: 25px;
-        margin-bottom: 25px;
+        padding: 20px;
+        margin-bottom: 30px;
     }
     
     .chart-header {
@@ -305,483 +152,425 @@
         font-size: 1.2rem;
         font-weight: 600;
         color: var(--text-primary);
+    }
+    
+    .chart-filters {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .chart-filter {
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        background-color: var(--hover-bg);
+        color: var(--text-secondary);
+        border: 1px solid var(--card-border);
+        transition: all 0.3s ease;
+    }
+    
+    .chart-filter.active {
+        background-color: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+    
+    .analysis-container {
+        background-color: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .analysis-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 20px;
         display: flex;
         align-items: center;
     }
     
-    .chart-title i {
+    .analysis-title i {
         margin-left: 10px;
-        color: #F7931A;
+        color: #FFD700;
     }
     
-    .chart-container {
-        height: 400px;
-        position: relative;
+    .analysis-content {
+        color: var(--text-secondary);
+        line-height: 1.8;
+    }
+    
+    .analysis-meta {
+        margin-top: 20px;
+        display: flex;
+        justify-content: space-between;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+    }
+    
+    .favorite-btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 15px;
+        border-radius: 8px;
+        background-color: var(--hover-bg);
+        color: var(--text-primary);
+        border: 1px solid var(--card-border);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+    }
+    
+    .favorite-btn i {
+        margin-left: 8px;
+        color: #FFC107;
+    }
+    
+    .favorite-btn:hover {
+        background-color: var(--card-border);
     }
 </style>
 @endsection
 
 @section('content')
-<!-- هدر صفحه -->
+<!-- هدر بازار طلا -->
 <div class="market-header">
-    <div class="market-title">
-        <div class="icon">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="market-title">
             <i class="fas fa-coins"></i>
-        </div>
-        <div>
-            <h1>قیمت طلا</h1>
-            <p class="market-subtitle">آخرین قیمت‌های طلا در بازار</p>
-        </div>
+            بازار طلا
+        </h1>
+        <button class="favorite-btn">
+            <i class="far fa-star"></i>
+            افزودن به علاقه‌مندی‌ها
+        </button>
     </div>
-    <button id="refresh-btn" class="refresh-btn">
-        <i class="fas fa-sync-alt"></i> به‌روزرسانی
-    </button>
+    <p class="market-subtitle">قیمت‌های لحظه‌ای طلا، سکه و مثقال طلا</p>
 </div>
 
-<!-- کارت‌های قیمت طلا -->
-<div class="row">
-    <!-- طلای 18 عیار -->
-    <div class="col-md-6 col-lg-3 mb-4">
-        <div class="price-card" id="gold-18-card">
-            <div class="card-icon">
-                <i class="fas fa-coins"></i>
-            </div>
-            <div class="title">طلای 18 عیار</div>
-            <div class="subtitle">هر گرم</div>
-            <div class="price" id="gold-18-price">{{ number_format($goldData['geram18']['current'] ?? 35800000) }} تومان</div>
-            <div class="change {{ ($goldData['geram18']['change'] ?? 1.2) > 0 ? 'positive' : 'negative' }}" id="gold-18-change">
-                <i class="fas {{ ($goldData['geram18']['change'] ?? 1.2) > 0 ? 'fa-caret-up' : 'fa-caret-down' }}"></i>
-                {{ $goldData['geram18']['change'] ?? 1.2 }}%
-            </div>
-            <div class="range">
-                <div class="item">
-                    <div class="label">پایین‌ترین</div>
-                    <div class="value" id="gold-18-low">{{ number_format($goldData['geram18']['low'] ?? 35400000) }}</div>
-                </div>
-                <div class="item">
-                    <div class="label">بالاترین</div>
-                    <div class="value" id="gold-18-high">{{ number_format($goldData['geram18']['high'] ?? 36000000) }}</div>
-                </div>
-            </div>
-            <div class="updated-time">
-                به‌روزرسانی: <span id="gold-18-update-time">{{ $goldData['geram18']['updated_at'] ?? now()->format('H:i:s') }}</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- طلای 24 عیار -->
+<!-- قیمت‌های اصلی -->
+<div class="row mb-4">
+    <!-- قیمت طلای 18 عیار -->
     <div class="col-md-6 col-lg-3 mb-4">
         <div class="price-card">
-            <div class="card-icon">
-                <i class="fas fa-coins"></i>
+            <h3 class="price-title">
+                <i class="fas fa-ring"></i>
+                طلای 18 عیار
+            </h3>
+            <div class="price-value">2,850,000 تومان</div>
+            <div class="price-change positive">
+                <i class="fas fa-caret-up"></i>
+                1.5%
             </div>
-            <div class="title">طلای 24 عیار</div>
-            <div class="subtitle">هر گرم</div>
-            <div class="price">{{ number_format($goldData['geram24']['current'] ?? 47700000) }} تومان</div>
-            <div class="change {{ ($goldData['geram24']['change'] ?? 1.3) > 0 ? 'positive' : 'negative' }}">
-                <i class="fas {{ ($goldData['geram24']['change'] ?? 1.3) > 0 ? 'fa-caret-up' : 'fa-caret-down' }}"></i>
-                {{ $goldData['geram24']['change'] ?? 1.3 }}%
-            </div>
-            <div class="range">
-                <div class="item">
-                    <div class="label">پایین‌ترین</div>
-                    <div class="value">{{ number_format($goldData['geram24']['low'] ?? 47200000) }}</div>
-                </div>
-                <div class="item">
-                    <div class="label">بالاترین</div>
-                    <div class="value">{{ number_format($goldData['geram24']['high'] ?? 48000000) }}</div>
-                </div>
-            </div>
-            <div class="updated-time">
-                به‌روزرسانی: {{ $goldData['geram24']['updated_at'] ?? now()->format('H:i:s') }}
-            </div>
+            <div class="price-time">آخرین به‌روزرسانی: 15:30</div>
         </div>
     </div>
     
-    <!-- انس جهانی -->
+    <!-- قیمت سکه امامی -->
     <div class="col-md-6 col-lg-3 mb-4">
-        <div class="price-card" id="ons-card">
-            <div class="card-icon">
+        <div class="price-card">
+            <h3 class="price-title">
+                <i class="fas fa-coins"></i>
+                سکه امامی
+            </h3>
+            <div class="price-value">29,500,000 تومان</div>
+            <div class="price-change positive">
+                <i class="fas fa-caret-up"></i>
+                2.1%
+            </div>
+            <div class="price-time">آخرین به‌روزرسانی: 15:30</div>
+        </div>
+    </div>
+    
+    <!-- قیمت نیم سکه -->
+    <div class="col-md-6 col-lg-3 mb-4">
+        <div class="price-card">
+            <h3 class="price-title">
+                <i class="fas fa-coins"></i>
+                نیم سکه
+            </h3>
+            <div class="price-value">16,800,000 تومان</div>
+            <div class="price-change positive">
+                <i class="fas fa-caret-up"></i>
+                1.8%
+            </div>
+            <div class="price-time">آخرین به‌روزرسانی: 15:30</div>
+        </div>
+    </div>
+    
+    <!-- قیمت انس جهانی -->
+    <div class="col-md-6 col-lg-3 mb-4">
+        <div class="price-card">
+            <h3 class="price-title">
                 <i class="fas fa-globe-americas"></i>
+                انس جهانی
+            </h3>
+            <div class="price-value">2,380 دلار</div>
+            <div class="price-change positive">
+                <i class="fas fa-caret-up"></i>
+                0.8%
             </div>
-            <div class="title">انس جهانی طلا</div>
-            <div class="subtitle">اونس</div>
-            <div class="price" id="ons-price">{{ number_format($goldData['ons']['current'] ?? 2120.50, 2) }} دلار</div>
-            <div class="change {{ ($goldData['ons']['change'] ?? 0.8) > 0 ? 'positive' : 'negative' }}" id="ons-change">
-                <i class="fas {{ ($goldData['ons']['change'] ?? 0.8) > 0 ? 'fa-caret-up' : 'fa-caret-down' }}"></i>
-                {{ $goldData['ons']['change'] ?? 0.8 }}%
-            </div>
-            <div class="range">
-                <div class="item">
-                    <div class="label">پایین‌ترین</div>
-                    <div class="value" id="ons-low">{{ number_format($goldData['ons']['low'] ?? 2110.25, 2) }}</div>
-                </div>
-                <div class="item">
-                    <div class="label">بالاترین</div>
-                    <div class="value" id="ons-high">{{ number_format($goldData['ons']['high'] ?? 2125.75, 2) }}</div>
-                </div>
-            </div>
-            <div class="updated-time">
-                به‌روزرسانی: <span id="ons-update-time">{{ $goldData['ons']['updated_at'] ?? now()->format('H:i:s') }}</span>
-            </div>
-        </div>
-    </div>
-    
-    <!-- مثقال طلا -->
-    <div class="col-md-6 col-lg-3 mb-4">
-        <div class="price-card">
-            <div class="card-icon">
-                <i class="fas fa-balance-scale"></i>
-            </div>
-            <div class="title">مثقال طلا</div>
-            <div class="subtitle">هر مثقال</div>
-            <div class="price">{{ number_format($goldData['mesghal']['current'] ?? 155000000) }} تومان</div>
-            <div class="change {{ ($goldData['mesghal']['change'] ?? 1.1) > 0 ? 'positive' : 'negative' }}">
-                <i class="fas {{ ($goldData['mesghal']['change'] ?? 1.1) > 0 ? 'fa-caret-up' : 'fa-caret-down' }}"></i>
-                {{ $goldData['mesghal']['change'] ?? 1.1 }}%
-            </div>
-            <div class="range">
-                <div class="item">
-                    <div class="label">پایین‌ترین</div>
-                    <div class="value">{{ number_format($goldData['mesghal']['low'] ?? 153500000) }}</div>
-                </div>
-                <div class="item">
-                    <div class="label">بالاترین</div>
-                    <div class="value">{{ number_format($goldData['mesghal']['high'] ?? 156000000) }}</div>
-                </div>
-            </div>
-            <div class="updated-time">
-                به‌روزرسانی: {{ $goldData['mesghal']['updated_at'] ?? now()->format('H:i:s') }}
-            </div>
+            <div class="price-time">آخرین به‌روزرسانی: 15:30</div>
         </div>
     </div>
 </div>
 
-<!-- نمودار قیمت -->
-<div class="row">
-    <div class="col-12 mb-4">
-        <div class="chart-card">
-            <div class="chart-header">
-                <h3 class="chart-title"><i class="fas fa-chart-line"></i> نمودار قیمت طلا</h3>
-            </div>
-            <div class="chart-container">
-                <canvas id="goldChartCanvas"></canvas>
-            </div>
+<!-- نمودار قیمت طلا -->
+<div class="chart-container">
+    <div class="chart-header">
+        <div class="chart-title">نمودار قیمت طلای 18 عیار</div>
+        <div class="chart-filters">
+            <div class="chart-filter active">روزانه</div>
+            <div class="chart-filter">هفتگی</div>
+            <div class="chart-filter">ماهانه</div>
+            <div class="chart-filter">سالانه</div>
         </div>
     </div>
+    <canvas id="goldChart" height="300"></canvas>
 </div>
 
 <!-- جدول قیمت‌ها -->
-<div class="row">
-    <div class="col-12">
-        <div class="price-table-card">
-            <div class="price-table-header">
-                <h3 class="price-table-title"><i class="fas fa-list"></i> لیست قیمت‌های طلا و سکه</h3>
-            </div>
-            
-            <div class="table-responsive">
-                <table class="price-table">
-                    <thead>
-                        <tr>
-                            <th>نام</th>
-                            <th>قیمت</th>
-                            <th>تغییر</th>
-                            <th>کمترین</th>
-                            <th>بیشترین</th>
-                            <th>به‌روزرسانی</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <div class="asset-name">
-                                    <div class="asset-icon">
-                                        <i class="fas fa-coins"></i>
-                                    </div>
-                                    <div>
-                                        <div class="asset-title">طلای 18 عیار</div>
-                                        <div class="asset-subtitle">هر گرم</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="price-value">{{ number_format($goldData['geram18']['current'] ?? 35800000) }} تومان</td>
-                            <td>
-                                <div class="price-change {{ ($goldData['geram18']['change'] ?? 1.2) > 0 ? 'positive' : 'negative' }}">
-                                    {{ $goldData['geram18']['change'] ?? 1.2 }}%
-                                </div>
-                            </td>
-                            <td>{{ number_format($goldData['geram18']['low'] ?? 35400000) }}</td>
-                            <td>{{ number_format($goldData['geram18']['high'] ?? 36000000) }}</td>
-                            <td>{{ $goldData['geram18']['updated_at'] ?? now()->format('H:i:s') }}</td>
-                        </tr>
-                        
-                        <tr>
-                            <td>
-                                <div class="asset-name">
-                                    <div class="asset-icon">
-                                        <i class="fas fa-coins"></i>
-                                    </div>
-                                    <div>
-                                        <div class="asset-title">طلای 24 عیار</div>
-                                        <div class="asset-subtitle">هر گرم</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="price-value">{{ number_format($goldData['geram24']['current'] ?? 47700000) }} تومان</td>
-                            <td>
-                                <div class="price-change {{ ($goldData['geram24']['change'] ?? 1.3) > 0 ? 'positive' : 'negative' }}">
-                                    {{ $goldData['geram24']['change'] ?? 1.3 }}%
-                                </div>
-                            </td>
-                            <td>{{ number_format($goldData['geram24']['low'] ?? 47200000) }}</td>
-                            <td>{{ number_format($goldData['geram24']['high'] ?? 48000000) }}</td>
-                            <td>{{ $goldData['geram24']['updated_at'] ?? now()->format('H:i:s') }}</td>
-                        </tr>
-                        
-                        <tr>
-                            <td>
-                                <div class="asset-name">
-                                    <div class="asset-icon">
-                                        <i class="fas fa-globe-americas"></i>
-                                    </div>
-                                    <div>
-                                        <div class="asset-title">انس جهانی</div>
-                                        <div class="asset-subtitle">اونس</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="price-value">{{ number_format($goldData['ons']['current'] ?? 2120.50, 2) }} دلار</td>
-                            <td>
-                                <div class="price-change {{ ($goldData['ons']['change'] ?? 0.8) > 0 ? 'positive' : 'negative' }}">
-                                    {{ $goldData['ons']['change'] ?? 0.8 }}%
-                                </div>
-                            </td>
-                            <td>{{ number_format($goldData['ons']['low'] ?? 2110.25, 2) }}</td>
-                            <td>{{ number_format($goldData['ons']['high'] ?? 2125.75, 2) }}</td>
-                            <td>{{ $goldData['ons']['updated_at'] ?? now()->format('H:i:s') }}</td>
-                        </tr>
-                        
-                        <tr>
-                            <td>
-                                <div class="asset-name">
-                                    <div class="asset-icon">
-                                        <i class="fas fa-balance-scale"></i>
-                                    </div>
-                                    <div>
-                                        <div class="asset-title">مثقال طلا</div>
-                                        <div class="asset-subtitle">هر مثقال</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="price-value">{{ number_format($goldData['mesghal']['current'] ?? 155000000) }} تومان</td>
-                            <td>
-                                <div class="price-change {{ ($goldData['mesghal']['change'] ?? 1.1) > 0 ? 'positive' : 'negative' }}">
-                                    {{ $goldData['mesghal']['change'] ?? 1.1 }}%
-                                </div>
-                            </td>
-                            <td>{{ number_format($goldData['mesghal']['low'] ?? 153500000) }}</td>
-                            <td>{{ number_format($goldData['mesghal']['high'] ?? 156000000) }}</td>
-                            <td>{{ $goldData['mesghal']['updated_at'] ?? now()->format('H:i:s') }}</td>
-                        </tr>
-                        
-                        <tr>
-                            <td>
-                                <div class="asset-name">
-                                    <div class="asset-icon">
-                                        <i class="fas fa-coins"></i>
-                                    </div>
-                                    <div>
-                                        <div class="asset-title">سکه امامی</div>
-                                        <div class="asset-subtitle">هر عدد</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="price-value">{{ number_format($goldData['coin_emami']['current'] ?? 230000000) }} تومان</td>
-                            <td>
-                                <div class="price-change {{ ($goldData['coin_emami']['change'] ?? 1.2) > 0 ? 'positive' : 'negative' }}">
-                                    {{ $goldData['coin_emami']['change'] ?? 1.2 }}%
-                                </div>
-                            </td>
-                            <td>{{ number_format($goldData['coin_emami']['low'] ?? 228000000) }}</td>
-                            <td>{{ number_format($goldData['coin_emami']['high'] ?? 231000000) }}</td>
-                            <td>{{ $goldData['coin_emami']['updated_at'] ?? now()->format('H:i:s') }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+<div class="price-table">
+    <h3 class="price-table-title">
+        <i class="fas fa-table"></i>
+        قیمت انواع طلا و سکه
+    </h3>
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>نوع</th>
+                    <th>قیمت</th>
+                    <th>تغییر روزانه</th>
+                    <th>کمترین</th>
+                    <th>بیشترین</th>
+                    <th>زمان به‌روزرسانی</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>طلای 18 عیار</td>
+                    <td>2,850,000 تومان</td>
+                    <td class="text-success">+1.5%</td>
+                    <td>2,800,000 تومان</td>
+                    <td>2,860,000 تومان</td>
+                    <td>15:30</td>
+                </tr>
+                <tr>
+                    <td>طلای 24 عیار</td>
+                    <td>3,800,000 تومان</td>
+                    <td class="text-success">+1.6%</td>
+                    <td>3,750,000 تومان</td>
+                    <td>3,820,000 تومان</td>
+                    <td>15:30</td>
+                </tr>
+                <tr>
+                    <td>مثقال طلا</td>
+                    <td>12,350,000 تومان</td>
+                    <td class="text-success">+1.4%</td>
+                    <td>12,200,000 تومان</td>
+                    <td>12,400,000 تومان</td>
+                    <td>15:30</td>
+                </tr>
+                <tr>
+                    <td>سکه امامی</td>
+                    <td>29,500,000 تومان</td>
+                    <td class="text-success">+2.1%</td>
+                    <td>29,000,000 تومان</td>
+                    <td>29,600,000 تومان</td>
+                    <td>15:30</td>
+                </tr>
+                <tr>
+                    <td>سکه بهار آزادی</td>
+                    <td>28,800,000 تومان</td>
+                    <td class="text-success">+2.0%</td>
+                    <td>28,400,000 تومان</td>
+                    <td>29,000,000 تومان</td>
+                    <td>15:30</td>
+                </tr>
+                <tr>
+                    <td>نیم سکه</td>
+                    <td>16,800,000 تومان</td>
+                    <td class="text-success">+1.8%</td>
+                    <td>16,500,000 تومان</td>
+                    <td>16,900,000 تومان</td>
+                    <td>15:30</td>
+                </tr>
+                <tr>
+                    <td>ربع سکه</td>
+                    <td>9,800,000 تومان</td>
+                    <td class="text-success">+1.5%</td>
+                    <td>9,600,000 تومان</td>
+                    <td>9,850,000 تومان</td>
+                    <td>15:30</td>
+                </tr>
+                <tr>
+                    <td>سکه گرمی</td>
+                    <td>5,200,000 تومان</td>
+                    <td class="text-success">+1.0%</td>
+                    <td>5,150,000 تومان</td>
+                    <td>5,250,000 تومان</td>
+                    <td>15:30</td>
+                </tr>
+                <tr>
+                    <td>انس جهانی</td>
+                    <td>2,380 دلار</td>
+                    <td class="text-success">+0.8%</td>
+                    <td>2,365 دلار</td>
+                    <td>2,385 دلار</td>
+                    <td>15:30</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- تحلیل بازار -->
+<div class="analysis-container">
+    <h3 class="analysis-title">
+        <i class="fas fa-chart-bar"></i>
+        تحلیل بازار طلا
+    </h3>
+    <div class="analysis-content">
+        <p>قیمت طلا در بازارهای جهانی با افزایش تنش‌های ژئوپلیتیکی به بالاترین سطح خود در شش ماه گذشته رسید. این افزایش قیمت در بازار داخلی نیز تأثیرگذار بوده و باعث رشد قیمت انواع طلا و سکه شده است.</p>
+        
+        <p>عوامل مؤثر بر افزایش قیمت طلا در روزهای اخیر:</p>
+        <ul>
+            <li>افزایش تنش‌های ژئوپلیتیکی در خاورمیانه</li>
+            <li>کاهش ارزش دلار در بازارهای جهانی</li>
+            <li>افزایش تقاضا برای دارایی‌های امن در شرایط نااطمینانی اقتصادی</li>
+            <li>افزایش نرخ تورم در اقتصادهای بزرگ جهان</li>
+        </ul>
+        
+        <p>پیش‌بینی می‌شود با ادامه شرایط فعلی، قیمت طلا در کوتاه‌مدت روند صعودی خود را حفظ کند. با این حال، تصمیمات بانک‌های مرکزی در خصوص نرخ بهره می‌تواند بر روند قیمت طلا تأثیرگذار باشد.</p>
+    </div>
+    <div class="analysis-meta">
+        <div>نویسنده: کارشناس اقتصادی</div>
+        <div>تاریخ انتشار: 1404/02/27</div>
     </div>
 </div>
 @endsection
 
 @section('scripts')
 <script>
-    // اسکریپت برای به‌روزرسانی داده‌ها
     document.addEventListener('DOMContentLoaded', function() {
-        // دکمه به‌روزرسانی
-        const refreshBtn = document.getElementById('refresh-btn');
-        refreshBtn.addEventListener('click', function() {
-            // نمایش حالت در حال بارگیری
-            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> در حال به‌روزرسانی...';
-            this.disabled = true;
-            
-            // ارسال درخواست به‌روزرسانی به سرور
-            fetch('/api/gold-prices/refresh', {
-                method: 'GET',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                // به‌روزرسانی داده‌ها در صفحه
-                updateGoldPrices(data);
-                
-                // بازگرداندن دکمه به حالت اولیه
-                refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> به‌روزرسانی';
-                refreshBtn.disabled = false;
-                
-                // نمایش پیام موفقیت
-                showNotification('اطلاعات با موفقیت به‌روزرسانی شد', 'success');
-            })
-            .catch(error => {
-                console.error('خطا در به‌روزرسانی:', error);
-                
-                // بازگرداندن دکمه به حالت اولیه
-                refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> به‌روزرسانی';
-                refreshBtn.disabled = false;
-                
-                // نمایش پیام خطا
-                showNotification('خطا در به‌روزرسانی اطلاعات', 'error');
-            });
-        });
-        
-        // تابع به‌روزرسانی قیمت‌های طلا در صفحه
-        function updateGoldPrices(data) {
-            // به‌روزرسانی طلای 18 عیار
-            if (data.geram18) {
-                document.getElementById('gold-18-price').innerText = numberFormat(data.geram18.current) + ' تومان';
-                document.getElementById('gold-18-change').innerHTML = 
-                    `<i class="fas ${data.geram18.change > 0 ? 'fa-caret-up' : 'fa-caret-down'}"></i> ${data.geram18.change}%`;
-                document.getElementById('gold-18-change').className = 
-                    `change ${data.geram18.change > 0 ? 'positive' : 'negative'}`;
-                document.getElementById('gold-18-low').innerText = numberFormat(data.geram18.low);
-                document.getElementById('gold-18-high').innerText = numberFormat(data.geram18.high);
-                document.getElementById('gold-18-update-time').innerText = data.geram18.updated_at;
-            }
-            
-            // به‌روزرسانی انس جهانی
-            if (data.ons) {
-                document.getElementById('ons-price').innerText = numberFormat(data.ons.current, 2) + ' دلار';
-                document.getElementById('ons-change').innerHTML = 
-                    `<i class="fas ${data.ons.change > 0 ? 'fa-caret-up' : 'fa-caret-down'}"></i> ${data.ons.change}%`;
-                document.getElementById('ons-change').className = 
-                    `change ${data.ons.change > 0 ? 'positive' : 'negative'}`;
-                document.getElementById('ons-low').innerText = numberFormat(data.ons.low, 2);
-                document.getElementById('ons-high').innerText = numberFormat(data.ons.high, 2);
-                document.getElementById('ons-update-time').innerText = data.ons.updated_at;
-            }
-            
-            // به‌روزرسانی نمودار
-            updateChart(data);
-        }
-        
-        // تابع فرمت‌دهی اعداد
-        function numberFormat(number, decimals = 0) {
-            return new Intl.NumberFormat('fa-IR', {
-                minimumFractionDigits: decimals,
-                maximumFractionDigits: decimals
-            }).format(number);
-        }
-        
-        // تابع نمایش اعلان
-        function showNotification(message, type = 'info') {
-            // اینجا می‌توانید از کتابخانه‌های نمایش اعلان استفاده کنید
-            // مثال ساده:
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            notification.innerText = message;
-            document.body.appendChild(notification);
-            
-            // حذف اعلان بعد از چند ثانیه
-            setTimeout(() => {
-                notification.remove();
-            }, 3000);
-        }
-        
-        // راه‌اندازی نمودار
-        const ctx = document.getElementById('goldChartCanvas').getContext('2d');
-        let goldChart;
-        
-        function initChart() {
-            // داده‌های نمونه برای نمودار
-            const sampleData = {
-                labels: ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر'],
+        // نمودار قیمت طلا
+        const ctx = document.getElementById('goldChart').getContext('2d');
+        const goldChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['8:00', '9:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00'],
                 datasets: [{
                     label: 'قیمت طلای 18 عیار (تومان)',
-                    data: [32000000, 33500000, 34200000, 34800000, 35300000, 35600000, 35800000],
-                    borderColor: '#F7931A',
-                    backgroundColor: 'rgba(247, 147, 26, 0.1)',
+                    data: [2820000, 2830000, 2825000, 2835000, 2840000, 2845000, 2838000, 2850000, 2855000],
+                    borderColor: '#FFD700',
+                    backgroundColor: 'rgba(255, 215, 0, 0.1)',
                     borderWidth: 2,
                     fill: true,
                     tension: 0.4
                 }]
-            };
-            
-            goldChart = new Chart(ctx, {
-                type: 'line',
-                data: sampleData,
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        },
-                        tooltip: {
-                            mode: 'index',
-                            intersect: false,
-                        }
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
                     },
-                    scales: {
-                        y: {
-                            beginAtZero: false,
-                            ticks: {
-                                callback: function(value) {
-                                    return numberFormat(value / 1000000) + ' میلیون';
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
                                 }
+                                if (context.parsed.y !== null) {
+                                    label += new Intl.NumberFormat('fa-IR').format(context.parsed.y) + ' تومان';
+                                }
+                                return label;
                             }
                         }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: getComputedStyle(document.documentElement).getPropertyValue('--text-secondary')
+                        }
                     },
-                    interaction: {
-                        mode: 'nearest',
-                        axis: 'x',
-                        intersect: false
+                    y: {
+                        beginAtZero: false,
+                        grid: {
+                            color: getComputedStyle(document.documentElement).getPropertyValue('--card-border')
+                        },
+                        ticks: {
+                            color: getComputedStyle(document.documentElement).getPropertyValue('--text-secondary'),
+                            callback: function(value) {
+                                return new Intl.NumberFormat('fa-IR').format(value);
+                            }
+                        }
                     }
                 }
-            });
-        }
-        
-        function updateChart(data) {
-            // به‌روزرسانی نمودار با داده‌های جدید
-            if (goldChart && data.chart) {
-                goldChart.data.labels = data.chart.labels;
-                goldChart.data.datasets[0].data = data.chart.values;
-                goldChart.update();
             }
-        }
+        });
         
-        // راه‌اندازی نمودار در صورت وجود کتابخانه Chart.js
-        if (typeof Chart !== 'undefined') {
-            initChart();
-        } else {
-            console.warn('Chart.js not loaded');
-        }
+        // فیلترهای نمودار
+        const chartFilters = document.querySelectorAll('.chart-filter');
+        chartFilters.forEach(filter => {
+            filter.addEventListener('click', function() {
+                chartFilters.forEach(f => f.classList.remove('active'));
+                this.classList.add('active');
+                
+                // در اینجا می‌توانید داده‌های نمودار را بر اساس فیلتر انتخاب شده تغییر دهید
+                let newData = [];
+                
+                switch(this.textContent) {
+                    case 'روزانه':
+                        newData = [2820000, 2830000, 2825000, 2835000, 2840000, 2845000, 2838000, 2850000, 2855000];
+                        goldChart.data.labels = ['8:00', '9:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00'];
+                        break;
+                    case 'هفتگی':
+                        newData = [2800000, 2810000, 2820000, 2830000, 2840000, 2845000, 2850000];
+                        goldChart.data.labels = ['شنبه', 'یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنج‌شنبه', 'جمعه'];
+                        break;
+                    case 'ماهانه':
+                        newData = [2750000, 2780000, 2800000, 2820000, 2850000];
+                        goldChart.data.labels = ['هفته 1', 'هفته 2', 'هفته 3', 'هفته 4', 'هفته 5'];
+                        break;
+                    case 'سالانه':
+                        newData = [2200000, 2300000, 2400000, 2350000, 2450000, 2500000, 2600000, 2700000, 2650000, 2750000, 2800000, 2850000];
+                        goldChart.data.labels = ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'];
+                        break;
+                }
+                
+                goldChart.data.datasets[0].data = newData;
+                goldChart.update();
+            });
+        });
         
-        // بروزرسانی خودکار هر 5 دقیقه
-        setInterval(() => {
-            refreshBtn.click();
-        }, 5 * 60 * 1000);
+        // دکمه علاقه‌مندی
+        const favoriteBtn = document.querySelector('.favorite-btn');
+        favoriteBtn.addEventListener('click', function() {
+            const icon = this.querySelector('i');
+            
+            if (icon.classList.contains('far')) {
+                icon.classList.remove('far');
+                icon.classList.add('fas');
+                this.innerHTML = '<i class="fas fa-star"></i> حذف از علاقه‌مندی‌ها';
+            } else {
+                icon.classList.remove('fas');
+                icon.classList.add('far');
+                this.innerHTML = '<i class="far fa-star"></i> افزودن به علاقه‌مندی‌ها';
+            }
+        });
     });
 </script>
 @endsection

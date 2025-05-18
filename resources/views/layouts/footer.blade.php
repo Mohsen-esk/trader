@@ -63,5 +63,6 @@
         
         // نمایش نشانگر هر 10 دقیقه
         setInterval(showUpdateIndicator, 600000);
+        <li><a href="{{ route('user-dashboard') }}">داشبورد</a></li>
     });
 </script>
